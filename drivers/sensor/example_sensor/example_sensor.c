@@ -26,7 +26,7 @@ static int example_sensor_sample_fetch(const struct device *dev, enum sensor_cha
 	struct example_sensor_data *data = dev->data;
 
 	data->state = gpio_pin_get_dt(&config->input);
-
+	chan = SENSOR_CHAN_PROX;
 	return 0;
 }
 
