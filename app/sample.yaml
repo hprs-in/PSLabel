@@ -2,8 +2,8 @@
 # the Zephyr testing tool. In this file, multiple combinations can be specified,
 # so that you can easily test all of them locally or in CI.
 sample:
-  description: Example application
-  name: example-application
+  description: PSLabel application
+  name: PSLabel
 common:
   sysbuild: true
   build_only: true
