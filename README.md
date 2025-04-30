@@ -62,7 +62,7 @@ command:
 
 ```shell
 # initialize my-workspace for the ncs-example-application (main branch)
-west init -m https://github.com/nrfconnect/ncs-example-application --mr main my-workspace
+west init -m https://github.com/hprs-in/PSLabel --mr main my-workspace
 # update nRF Connect SDK modules
 cd my-workspace
 west update
@@ -73,7 +73,7 @@ west update
 To build the application, run the following command:
 
 ```shell
-cd example-application
+cd PSLabel
 west build -b $BOARD app
 ```
 
