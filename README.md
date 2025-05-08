@@ -1,137 +1,131 @@
-# nRF Connect SDK example application
 
-<a href="https://github.com/nrfconnect/ncs-example-application/actions/workflows/build-using-docker.yml?query=branch%3Amain">
-  <img src="https://github.com/nrfconnect/ncs-example-application/actions/workflows/build-using-docker.yml/badge.svg?event=push">
-</a>
-<a href="https://github.com/nrfconnect/ncs-example-application/actions/workflows/docs.yml?query=branch%3Amain">
-  <img src="https://github.com/nrfconnect/ncs-example-application/actions/workflows/docs.yml/badge.svg?event=push">
-</a>
-<a href="https://nrfconnect.github.io/ncs-example-application">
-  <img alt="Documentation" src="https://img.shields.io/badge/documentation-3D578C?logo=sphinx&logoColor=white">
-</a>
-<a href="https://nrfconnect.github.io/ncs-example-application/doxygen">
-  <img alt="API Documentation" src="https://img.shields.io/badge/API-documentation-3D578C?logo=c&logoColor=white">
-</a>
+# PSLabel – The Future of Smart eInk Labeling
 
-This repository contains an nRF Connect SDK example application. The main
-purpose of this repository is to serve as a reference on how to structure nRF Connect
-SDK based applications. Some of the features demonstrated in this example are:
+> **Low-power | Wireless | Modular | Open Source**
 
-- Basic [Zephyr application][app_dev] skeleton
-- [Zephyr workspace applications][workspace_app]
-- [Zephyr modules][modules]
-- [West T2 topology][west_t2]
-- [Custom boards][board_porting]
-- Custom [devicetree bindings][bindings]
-- Out-of-tree [drivers][drivers]
-- Out-of-tree libraries
-- Example CI configuration (using GitHub Actions)
-- Custom [west extension][west_ext]
-- Custom [Zephyr runner][runner_ext]
-- Doxygen and Sphinx documentation boilerplate
+<p align="center">
+  <a href="https://github.com/hprs-in/PSLabel/actions/workflows/build-using-docker.yml?query=branch%3Amain">
+    <img src="https://github.com/hprs-in/PSLabel/actions/workflows/build-using-docker.yml/badge.svg?event=push" alt="Build Status">
+  </a>
+  <a href="https://github.com/hprs-in/PSLabel/actions/workflows/docs.yml?query=branch%3Amain">
+    <img src="https://github.com/hprs-in/PSLabel/actions/workflows/docs.yml/badge.svg?event=push" alt="Docs Build">
+  </a>
+  <a href="https://hprs-in.github.io/PSLabel/">
+    <img src="https://img.shields.io/badge/documentation-3D578C?logo=sphinx&logoColor=white" alt="Documentation">
+  </a>
+  <a href="https://hprs-in.github.io/PSLabel/doxygen">
+    <img src="https://img.shields.io/badge/API-documentation-3D578C?logo=c&logoColor=white" alt="API Documentation">
+  </a>
+    <a href="https://sonarcloud.io/summary/new_code?id=hprs-in_PSLabel">
+    <img src="https://sonarcloud.io/api/project_badges/measure?project=hprs-in_PSLabel&metric=alert_status" alt="Quality Gate Status">
+  </a>
+</p>
 
-This repository is versioned together with the [nRF Connect SDK main tree][sdk-nrf]. This
-means that every time that nRF Connect SDK is tagged, this repository is tagged as well
-with the same version number, and the [manifest](west.yml) entry for `zephyr`
-will point to the corresponding nRF Connect SDK tag. For example, the `ncs-example-application`
-v2.5.0 will point to nRF Connect SDK v2.5.0. Note that the `main` branch always
-points to the development branch of nRF Connect SDK, also `main`.
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=hprs-in_PSLabel)
 
-[app_dev]: https://docs.zephyrproject.org/latest/develop/application/index.html
-[workspace_app]: https://docs.zephyrproject.org/latest/develop/application/index.html#zephyr-workspace-app
-[modules]: https://docs.zephyrproject.org/latest/develop/modules.html
-[west_t2]: https://docs.zephyrproject.org/latest/develop/west/workspaces.html#west-t2
-[board_porting]: https://docs.zephyrproject.org/latest/guides/porting/board_porting.html
-[bindings]: https://docs.zephyrproject.org/latest/guides/dts/bindings.html
-[drivers]: https://docs.zephyrproject.org/latest/reference/drivers/index.html
-[sdk-nrf]: https://github.com/nrfconnect/sdk-nrf
-[west_ext]: https://docs.zephyrproject.org/latest/develop/west/extensions.html
-[runner_ext]: https://docs.zephyrproject.org/latest/develop/modules.html#external-runners
+**PSLabel** is an open-source platform for creating **scalable, ultra-low-power eInk label systems**. Designed for retail, logistics, healthcare, smart offices, and smart homes — PSLabel combines **BLE + NFC**, **modular firmware**, and **cloud-ready OTA** capabilities to redefine digital labeling.
 
-## Getting started
+---
 
-Before getting started, make sure you have a proper nRF Connect SDK development environment.
-Follow the official
-[Installation guide](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/installation/install_ncs.html).
+## 🌟 Vision
 
-### Initialization
+To build the **de facto standard for smart, wireless labeling** in embedded environments using open technologies — empowering developers and businesses to integrate **dynamic, energy-efficient visual displays** in real-world workflows.
 
-The first step is to initialize the workspace folder (``my-workspace``) where
-the ``ncs-example-application`` and all nRF Connect SDK modules will be cloned. Run the following
-command:
+---
 
-```shell
-# initialize my-workspace for the ncs-example-application (main branch)
-west init -m https://github.com/hprs-in/PSLabel --mr main my-workspace
-# update nRF Connect SDK modules
-cd my-workspace
-west update
+## 🔧 Tech Stack
+
+- **Firmware**: Zephyr RTOS / nRF Connect SDK (Nordic)
+- **Communication**: BLE Peripheral + NFC Wake
+- **Display Driver**: eInk (GoodDisplay/Waveshare) over SPI
+- **Power**: Coin cell – optimized sleep/wake cycle
+- **OTA Support**: BLE
+- **App Layer**: Android/iOS/Web BLE Gateway (future)
+
+---
+
+## 🚀 Use Cases
+
+| Domain         | Use Case                          |
+|----------------|-----------------------------------|
+| Warehousing    | Shelf labels, bin IDs, scan-to-update |
+| Retail         | Wireless price tags, expiry tracking |
+| Healthcare     | Dynamic patient labels, dosage logs |
+| Smart Office   | Door signs, desk status, meeting labels |
+| Smart Home     | Task boards, inventory tags, reminders |
+
+---
+
+## 📦 Project Structure
+
+```
+pslabel/
+├── app/                # Zephyr app: main, config, drivers
+├── boards/             # Custom board overlays
+├── include/            # Shared headers
+├── tools/              # Python tools for BLE image upload
+└── docs/               # Diagrams, documentation
 ```
 
-### Building and running
+---
 
-To build the application, run the following command:
+## 🔄 System Architecture
 
-```shell
-cd PSLabel
-west build -b $BOARD app
+```
+[ Smartphone NFC ]
+        |
+[NFC Wake Trigger] --> [PSLabel Device (BLE On)]
+        |
+[Mobile App/Web BLE]
+        |
+[BLE GATT Transfer Image]
+        |
+[Render eInk via SPI]
+        |
+[Enter Deep Sleep]
 ```
 
-where `$BOARD` is the target board.
+---
 
-You can use the `custom_plank` board found in this repository. Note that you can use
-Zephyr and nRF Connect SDK sample boards if an appropriate overlay is provided (see `app/boards`).
+## 📅 Roadmap (2025 – 2026)
 
-A sample debug configuration is also provided. To apply it, run the following
-command:
+- ✅ NFC wake-up + BLE bootstrapping
+- ✅ BLE GATT image transfer
+- ✅ SPI-based eInk display rendering
+- 🔜 BLE OTA using MCUBoot
+- 🔜 Mobile App (Flutter) for BLE upload
+- 🔜 NFC provisioning (BLE keys, config)
+- 🔜 Multi-label sync via gateway
+- 🔜 Demo
 
-```shell
-west build -b $BOARD app -- -DEXTRA_CONF_FILE=debug.conf
-```
+---
 
-Once you have built the application, run the following command to flash it:
+## 🤝 Contributing
 
-```shell
-west flash
-```
+We welcome contributions from embedded engineers, UX designers, and technical writers. Start here:
 
-### Testing
+- Fork the repo
+- Check open [Issues](https://github.com/hprs-in/PSLabel/issues)
+- Add features, optimize power, or improve image handling
 
-To execute Twister integration tests, run the following command:
+See [CONTRIBUTING.md](CONTRIBUTING.md) for coding style and guidelines.
 
-```shell
-west twister -T tests --integration
-```
+---
 
-### Documentation
+## 📚 References & Inspirations
 
-A minimal documentation setup is provided for Doxygen and Sphinx. To build the
-documentation first change to the ``doc`` folder:
+- [Nordic Semiconductor nRF Connect SDK Examples](https://github.com/nrfconnect/ncs-example-application)
+- [Zephyr RTOS](https://zephyrproject.org/)
+- [GoodDisplay / Waveshare](https://www.waveshare.com/)
 
-```shell
-cd doc
-```
+---
 
-Before continuing, check if you have Doxygen installed. It is recommended to
-use the same Doxygen version used in [CI](.github/workflows/docs.yml). To
-install Sphinx, make sure you have a Python installation in place and run:
+## 📜 License
 
-```shell
-pip install -r requirements.txt
-```
+This project is licensed under the MIT License – see [LICENSE](LICENSE) for details.
 
-API documentation (Doxygen) can be built using the following command:
+---
 
-```shell
-doxygen
-```
+## 👨‍💻 Maintainers & Community
 
-The output will be stored in the ``_build_doxygen`` folder. Similarly, the
-Sphinx documentation (HTML) can be built using the following command:
-
-```shell
-make html
-```
-
-The output will be stored in the ``_build_sphinx`` folder. You may check for
-other output formats other than HTML by running ``make help``.
+Developed and maintained by **[HPRS.in](https://hprs.in)**  
