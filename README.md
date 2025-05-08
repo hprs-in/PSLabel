@@ -13,7 +13,7 @@
   <a href="https://hprs-in.github.io/PSLabel/">
     <img src="https://img.shields.io/badge/documentation-3D578C?logo=sphinx&logoColor=white" alt="Documentation">
   </a>
-  <a href="https://hprs-in.github.io/PSLabel//doxygen">
+  <a href="https://hprs-in.github.io/PSLabel/doxygen">
     <img src="https://img.shields.io/badge/API-documentation-3D578C?logo=c&logoColor=white" alt="API Documentation">
   </a>
     <a href="https://sonarcloud.io/summary/new_code?id=hprs-in_PSLabel">
