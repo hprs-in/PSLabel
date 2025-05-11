@@ -1,5 +1,5 @@
 {
-    "sonarCloudOrganization": "hprsdatasync",
+    "sonarCloudOrganization": "hprs-in",
     "projectKey": "hprs-in_PSLabel",
     "region": "EU"
 }
