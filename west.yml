@@ -2,8 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 manifest:
-  self:
-    west-commands: scripts/west-commands.yml
+
 
   remotes:
     - name: ncs
@@ -13,5 +12,5 @@ manifest:
     - name: nrf
       remote: ncs
       repo-path: sdk-nrf
-      revision: v3.0.0
+      revision: v3.0.2
       import: true
