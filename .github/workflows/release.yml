@@ -1,4 +1,4 @@
-name: Create Release
+name: PSLabel Release
 
 on:
   push:
@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Release Version."
+        description: "Release Version (e.g., v0.0.1, v0.0.1-pslabel, v0.0.1-rc1)"
         required: true
-        default: "v0.0.0"
+        default: "v0.0.1"
         type: string
 
 jobs:
@@ -25,31 +25,64 @@ jobs:
       - name: Read version from VERSION file
         id: read_version
         run: |
+          # Always read the base version from VERSION file
+          MAJOR=$(grep VERSION_MAJOR app/VERSION | awk -F'=' '{print $2}' | tr -d '\r' | xargs)
+          MINOR=$(grep VERSION_MINOR app/VERSION | awk -F'=' '{print $2}' | tr -d '\r' | xargs)
+          PATCH=$(grep PATCHLEVEL app/VERSION | awk -F'=' '{print $2}' | tr -d '\r' | xargs)
+          BASE_VERSION="v${MAJOR}.${MINOR}.${PATCH}"
+          
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             VERSION="${{ github.event.inputs.version }}"
+            # Validate that input version starts with base version
+            if [[ ! "$VERSION" =~ ^"$BASE_VERSION"(-.*)?$ ]]; then
+              echo "❌ ERROR: Input version ($VERSION) must start with VERSION file version ($BASE_VERSION)"
+              echo "Examples: $BASE_VERSION, $BASE_VERSION-pslabel, $BASE_VERSION-rc1"
+              exit 1
+            fi
           else
-            MAJOR=$(grep VERSION_MAJOR app/VERSION | awk -F'=' '{print $2}' | tr -d '\r' | xargs)
-            MINOR=$(grep VERSION_MINOR app/VERSION | awk -F'=' '{print $2}' | tr -d '\r' | xargs)
-            PATCH=$(grep PATCHLEVEL app/VERSION | awk -F'=' '{print $2}' | tr -d '\r' | xargs)
-            VERSION="v${MAJOR}.${MINOR}.${PATCH}"
+            VERSION="$BASE_VERSION"
           fi
+          
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "file_version=$VERSION" >> $GITHUB_OUTPUT
+          echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
+          echo "Reading VERSION file content:"
+          cat app/VERSION
+          echo "Base version: $BASE_VERSION"
+          echo "Release version: $VERSION"
 
-      - name: Fail if tag and VERSION mismatch
+      - name: Create and push tag for workflow_dispatch
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.read_version.outputs.VERSION }}" -m "Release ${{ steps.read_version.outputs.VERSION }}"
+          git push origin "${{ steps.read_version.outputs.VERSION }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release manually with GH CLI
+        if: github.event_name == 'workflow_dispatch'
+        run: gh release create --draft "${{ steps.read_version.outputs.VERSION }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate tag matches VERSION file (for tag pushes)
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         run: |
           TAG_VERSION="${GITHUB_REF##*/}"
+          BASE_VERSION="${{ steps.read_version.outputs.base_version }}"
           echo "Tag pushed: $TAG_VERSION"
-          echo "Internal version: $FILE_VERSION"
-          if [ "$TAG_VERSION" != "$FILE_VERSION" ]; then
-            echo "❌ ERROR: Tag ($TAG_VERSION) does not match VERSION file ($FILE_VERSION)"
+          echo "Base version: $BASE_VERSION"
+          
+          # Check if tag starts with base version
+          if [[ ! "$TAG_VERSION" =~ ^"$BASE_VERSION"(-.*)?$ ]]; then
+            echo "❌ ERROR: Tag ($TAG_VERSION) must start with VERSION file version ($BASE_VERSION)"
+            echo "Examples: $BASE_VERSION, $BASE_VERSION-pslabel, $BASE_VERSION-rc1"
             exit 1
           else
-            echo "✅ Tag and VERSION file match."
+            echo "✅ Tag matches VERSION file base version."
           fi
-        env:
-          FILE_VERSION: ${{ steps.read_version.outputs.file_version }}
 
   build-binaries:
     needs: stage-release
@@ -74,6 +107,27 @@ jobs:
           path: ~/artifacts
 
       - name: Upload artifacts to release
-        run: gh release upload --clobber ${{ needs.stage-release.outputs.version }} ~/artifacts/*.*
+        run: |
+          if ls ~/artifacts/*.* 1> /dev/null 2>&1; then
+            gh release upload --clobber ${{ needs.stage-release.outputs.version }} ~/artifacts/*.*
+          else
+            echo "No artifacts found to upload"
+            exit 1
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  trigger-docs:
+    needs: [upload-binaries, stage-release]
+    runs-on: ubuntu-latest
+    permissions: write-all
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        
+      - name: Trigger documentation workflow
+        run: |
+          gh workflow run docs.yml --ref ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
