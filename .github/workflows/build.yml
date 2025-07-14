@@ -1,4 +1,9 @@
 name: Build code
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+  
 on:
 
   # Trigger on pushes to branches and pull requests
