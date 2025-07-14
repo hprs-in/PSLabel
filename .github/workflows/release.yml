@@ -107,6 +107,27 @@ jobs:
           path: ~/artifacts
 
       - name: Upload artifacts to release
-        run: gh release upload --clobber ${{ needs.stage-release.outputs.version }} ~/artifacts/*.*
+        run: |
+          if ls ~/artifacts/*.* 1> /dev/null 2>&1; then
+            gh release upload --clobber ${{ needs.stage-release.outputs.version }} ~/artifacts/*.*
+          else
+            echo "No artifacts found to upload"
+            exit 1
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  trigger-docs:
+    needs: [upload-binaries, stage-release]
+    runs-on: ubuntu-latest
+    permissions: write-all
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        
+      - name: Trigger documentation workflow
+        run: |
+          gh workflow run docs.yml --ref ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
