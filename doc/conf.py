@@ -6,10 +6,10 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'NCS Example Application'
+project = 'PSLabel Firmware Application'
 copyright = '2024, The Zephyr Community'
 author = 'The Zephyr Community'
-release = '1.0.0'
+release = '0.0.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
