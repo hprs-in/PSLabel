@@ -3,7 +3,18 @@
 
 name: Documentation
 
-on: [push, pull_request]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+  
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  release:
+    types: [published]
+  workflow_dispatch:
 
 env:
   DOXYGEN_VERSION: 1.9.6

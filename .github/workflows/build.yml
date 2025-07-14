@@ -1,0 +1,75 @@
+name: Build code
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+  
+on:
+
+  # Trigger on pushes to branches and pull requests
+  push:
+    branches:
+      - '**'
+      
+  # Trigger on pull requests targeting the specified branch
+  pull_request:
+    branches:
+      - '**'
+  workflow_call:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ghcr.io/nrfconnect/sdk-nrf-toolchain:v3.0.2
+    defaults:
+      run:
+        # Bash shell is needed to set toolchain related environment variables in docker container
+        # It is a workaround for GitHub Actions limitation https://github.com/actions/runner/issues/1964
+        shell: bash
+    strategy:
+      matrix:
+        board: [nrf54l15dk/nrf54l15/cpuapp] # Add 
+    
+
+    steps:
+    - name: Checkout repository pslabel
+      uses: actions/checkout@v4
+      with:
+          path: pslabel
+
+    - name: Prepare west project
+      run: |
+          west init -l pslabel
+          west update -o=--depth=1 -n
+
+    - name: Build Firmware
+      working-directory: pslabel
+      run: |
+        west build app -b ${{ matrix.board }}
+
+    - name: Extract version and create prefix
+      run: |
+        MAJOR=$(grep VERSION_MAJOR pslabel/app/VERSION | awk -F'=' '{print $2}' | tr -d '\r' | xargs)
+        MINOR=$(grep VERSION_MINOR pslabel/app/VERSION | awk -F'=' '{print $2}' | tr -d '\r' | xargs)
+        PATCH=$(grep PATCHLEVEL pslabel/app/VERSION | awk -F'=' '{print $2}' | tr -d '\r' | xargs)
+        VERSION="${MAJOR}.${MINOR}.${PATCH}"
+        echo "PREFIX=${{ github.event.repository.name }}-v${VERSION}" >> $GITHUB_ENV
+
+    - name: Generate short SHA
+      uses: benjlevesque/short-sha@v3.0
+
+    - name: Prepare artifacts
+      run: |
+        cd pslabel/build
+        mkdir -p artifacts
+        mv merged.hex artifacts/${{ env.PREFIX }}-${{ env.SHA }}.hex
+        if [ -f dfu_application.zip ]; then
+          mv dfu_application.zip artifacts/${{ env.PREFIX }}-FOTA-${{ env.SHA }}.zip
+        fi
+
+      # Run IDs are unique per repo but are reused on re-runs
+    - name: Save artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build_artifacts_${{ github.run_id }}
+        path: |
+          pslabel/build/artifacts/*

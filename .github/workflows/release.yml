@@ -1,0 +1,81 @@
+name: Create Release
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+  
+on:
+  push:
+    tags:
+    - 'v*.*.*'
+  # workflow_dispatch:
+    # inputs:
+    #   version:
+    #     description: "Release Version."
+    #     required: true
+    #     default: "v0.0.0"
+    #     type: string
+
+jobs:
+  stage-release:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    outputs:
+      version: ${{ steps.read_version.outputs.VERSION }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      
+      - name: Read version from VERSION file
+        id: read_version
+        run: |
+          MAJOR=$(grep VERSION_MAJOR app/VERSION | awk -F'=' '{print $2}' | tr -d '\r' | xargs)
+          MINOR=$(grep VERSION_MINOR app/VERSION | awk -F'=' '{print $2}' | tr -d '\r' | xargs)
+          PATCH=$(grep PATCHLEVEL app/VERSION | awk -F'=' '{print $2}' | tr -d '\r' | xargs)
+          VERSION="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "file_version=$VERSION" >> $GITHUB_OUTPUT
+
+      # - name: Create Release manually with GH CLI
+      #   if: ${{ github.event_name == 'workflow_dispatch' }}
+      #   run: gh release create --draft ${{ steps.read_version.outputs.VERSION }}
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fail if tag and VERSION mismatch
+        run: |
+          TAG_VERSION="${GITHUB_REF##*/}"
+          echo "Tag pushed: $TAG_VERSION"
+          echo "Internal version: $FILE_VERSION"
+          if [ "$TAG_VERSION" != "$FILE_VERSION" ]; then
+            echo "❌ ERROR: Tag ($TAG_VERSION) does not match VERSION file ($FILE_VERSION)"
+            exit 1
+          else
+            echo "✅ Tag and VERSION file match."
+          fi
+        env:
+          FILE_VERSION: ${{ steps.read_version.outputs.file_version }}
+
+  build-binaries:
+    needs: stage-release
+    uses: ./.github/workflows/build.yml
+
+  upload-binaries:
+    needs: [build-binaries, stage-release]
+    runs-on: ubuntu-latest
+    permissions: write-all
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build_artifacts_${{ github.run_id }}
+          path: ~/artifacts
+
+      - name: Upload artifacts to release
+        run: gh release upload --clobber ${{ needs.stage-release.outputs.version }} ~/artifacts/*.*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
