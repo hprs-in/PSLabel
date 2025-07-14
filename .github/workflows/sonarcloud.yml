@@ -7,7 +7,7 @@ concurrency:
 on:
   push:
     branches:
-      - '**'  # Run on all branches
+      - main 
     paths-ignore:
       - "doc/**"
       - "boards/**"
@@ -17,8 +17,6 @@ on:
       - "*.yml"
       - "*.yaml"
   pull_request:
-    branches:
-      - '**'  # Run on PRs to all branches
     paths:
       - '**/*.c'
       - '**/*.h'
