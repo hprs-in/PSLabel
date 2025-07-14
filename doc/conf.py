@@ -6,10 +6,10 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'PSLabel Firmware Application'
-copyright = '2024, The Zephyr Community'
-author = 'The Zephyr Community'
-release = '0.0.1'
+project = 'PSLabel'
+copyright = '2025, HPRS'
+author = 'HPRS Team'
+release = '1.0.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
