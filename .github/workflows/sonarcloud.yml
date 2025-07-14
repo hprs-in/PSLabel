@@ -79,11 +79,12 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           sonar-scanner \
-            --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}" \
+            --define sonar.cfamily.compile-commands="${{ env.BUILD_WRAPPER_OUT_DIR }}/compile_commands.json" \
             --define project.settings=sonar-project.properties \
             --define sonar.coverageReportPaths=coverage.xml \
             --define sonar.inclusions=**/*.c,**/*.h \
             --define sonar.exclusions=build/**,modules/**,bootloader/**,doc/**,boards/**,west.yml,*.md,*.txt,*.json,*.yml,*.yaml
+
       - name: Run sonar-scanner on PR
         working-directory: pslabel-oob
         if: github.event_name == 'pull_request'
@@ -96,7 +97,7 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           sonar-scanner \
-            --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}" \
+            --define sonar.cfamily.compile-commands="${{ env.BUILD_WRAPPER_OUT_DIR }}/compile_commands.json" \
             --define project.settings=sonar-project.properties \
             --define sonar.coverageReportPaths=coverage.xml \
             --define sonar.inclusions=**/*.c,**/*.h \
