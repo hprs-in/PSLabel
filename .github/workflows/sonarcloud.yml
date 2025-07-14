@@ -7,10 +7,18 @@ concurrency:
 on:
   push:
     branches:
-      - main
+      - '**'  # Run on all branches
     paths-ignore:
-      - "docs/**"
+      - "doc/**"
+      - "boards/**"
+      - "*.md"
+      - "*.txt"
+      - "*.json"
+      - "*.yml"
+      - "*.yaml"
   pull_request:
+    branches:
+      - '**'  # Run on PRs to all branches
     paths:
       - '**/*.c'
       - '**/*.h'
@@ -18,6 +26,7 @@ on:
       - '**/CMakelists.txt'
       - '**/Kconfig*'
       - '**/prj.conf'
+
 jobs:
   build:
     name: Build and analyze
@@ -27,20 +36,20 @@ jobs:
       pull-requests: write
     container: ghcr.io/zephyrproject-rtos/ci:v0.27.4
     env:
-      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
+      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory
       CMAKE_PREFIX_PATH: /opt/toolchains
     steps:
       - uses: actions/checkout@v4
         if: github.event_name == 'pull_request'
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
           path: pslabel-oob
 
       - uses: actions/checkout@v4
         if: github.event_name != 'pull_request'
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
           path: pslabel-oob
 
       - name: Initialize
@@ -55,6 +64,7 @@ jobs:
       - name: Install dependencies
         run: |
             pip install -r nrf/scripts/requirements-build.txt
+            pip install gcovr
             apt-get update
             apt install -y curl ruby-full
 
@@ -69,9 +79,27 @@ jobs:
       - name: Extract coverage into sonarqube xml format
         working-directory: pslabel-oob
         run: |
-          gcovr build -v --merge-mode-functions=separate --exclude='build' --sonarqube coverage.xml
+          if [ -d "build" ]; then
+            gcovr build -v --merge-mode-functions=separate --exclude='build|drivers' --sonarqube coverage.xml
+          else
+            echo "Build directory not found, creating empty coverage file"
+            echo '<?xml version="1.0" encoding="UTF-8"?><coverage version="1"></coverage>' > coverage.xml
+          fi
 
-      - name: Run sonar-scanner on main
+      - name: Debug build-wrapper output
+        working-directory: pslabel-oob
+        run: |
+          echo "Build wrapper output directory contents:"
+          ls -la ${{ env.BUILD_WRAPPER_OUT_DIR }}/
+          echo "Checking for compile_commands.json:"
+          if [ -f "${{ env.BUILD_WRAPPER_OUT_DIR }}/compile_commands.json" ]; then
+            echo "✅ compile_commands.json found"
+            wc -l ${{ env.BUILD_WRAPPER_OUT_DIR }}/compile_commands.json
+          else
+            echo "❌ compile_commands.json not found"
+          fi
+
+      - name: Run sonar-scanner for branch
         working-directory: pslabel-oob
         if: github.event_name != 'pull_request'
         env:
@@ -83,9 +111,10 @@ jobs:
             --define project.settings=sonar-project.properties \
             --define sonar.coverageReportPaths=coverage.xml \
             --define sonar.inclusions=**/*.c,**/*.h \
-            --define sonar.exclusions=build/**,modules/**,bootloader/**,doc/**,boards/**,west.yml,*.md,*.txt,*.json,*.yml,*.yaml
+            --define sonar.exclusions=build/**,modules/**,bootloader/**,doc/**,boards/**,west.yml,*.md,*.txt,*.json,*.yml,*.yaml \
+            --define sonar.branch.name=${{ github.ref_name }}
 
-      - name: Run sonar-scanner on PR
+      - name: Run sonar-scanner for PR
         working-directory: pslabel-oob
         if: github.event_name == 'pull_request'
         env:
