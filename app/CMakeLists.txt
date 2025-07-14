@@ -9,4 +9,4 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
 project(pslabel LANGUAGES C)
 
-target_sources(app PRIVATE src/main.c)
+target_sources(pslabel PRIVATE src/main.c)
