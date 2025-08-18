@@ -37,14 +37,14 @@ jobs:
       BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory
       CMAKE_PREFIX_PATH: /opt/toolchains
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: github.event_name == 'pull_request'
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
           path: pslabel-oob
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: github.event_name != 'pull_request'
         with:
           fetch-depth: 0
