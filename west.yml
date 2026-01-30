@@ -18,5 +18,5 @@ manifest:
       import: true
     - name: nrf-esl-bluetooth
       remote: nordicplayground
-      revision: main
+      revision: v2.5.1-stable
       path: modules/lib/nrf-esl-bluetooth
