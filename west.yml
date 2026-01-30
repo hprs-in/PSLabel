@@ -7,6 +7,8 @@ manifest:
   remotes:
     - name: ncs
       url-base: https://github.com/nrfconnect
+    - name: nordicplayground
+      url-base: https://github.com/NordicPlayground
 
   projects:
     - name: nrf
@@ -14,3 +16,7 @@ manifest:
       repo-path: sdk-nrf
       revision: v3.0.2
       import: true
+    - name: nrf-esl-bluetooth
+      remote: nordicplayground
+      revision: main
+      path: modules/lib/nrf-esl-bluetooth
