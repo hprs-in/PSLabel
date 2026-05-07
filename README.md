@@ -38,6 +38,7 @@ To build the **de facto standard for smart, wireless labeling** in embedded envi
 - **Firmware**: Zephyr RTOS / nRF Connect SDK (Nordic)
 - **MCU**: nRF52 and nRF54 Series (Build available for nRF54L15DK, nRF52840DK)
 - **Communication**: BLE Peripheral + NFC Wake
+- **BLE Profile**: Electronic Shelf Label (ESL) Profile - Bluetooth 5.4
 - **Display Driver**: eInk (GoodDisplay/Waveshare) over SPI
 - **Power**: Coin cell – optimized sleep/wake cycle
 - **OTA Support**: BLE
