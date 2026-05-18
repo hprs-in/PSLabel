@@ -59,7 +59,7 @@ jobs:
         echo "PREFIX=${{ github.event.repository.name }}-v${VERSION}" >> $GITHUB_ENV
 
     - name: Generate short SHA
-      uses: benjlevesque/short-sha@v3.0
+      uses: benjlevesque/short-sha@v4.0
 
     - name: Prepare artifacts
       run: |
